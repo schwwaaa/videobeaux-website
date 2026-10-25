@@ -177,8 +177,8 @@
             </div>
         </section>
         <!-- STAY IN THE LOOP -->
-        <!-- Set the form's action to your provider's endpoint (Buttondown, Formspree, Mailchimp embed …) and this section goes live.
-             Until then it only shows on localhost, with a note. See SIGNUP in site.js. -->
+        <!-- Set SIGNUP.action (a form endpoint) or SIGNUP.link (a hosted form's address) in site/site.js and this section goes live.
+             Until then it only shows on localhost, with a note. -->
         <section class="section s-yellow" id="stay" aria-labelledby="stay-h" hidden>
             <div class="shell stay">
                 <div>
@@ -186,7 +186,7 @@
                     <p>New program modes, new builds, and the occasional good idea. Or join the testing group and try things early.</p>
                 </div>
                 <form class="signup" id="signup" method="post" target="_blank" novalidate>
-                    <p class="dev-note" id="signup-note" hidden>Local preview: the form isn't connected yet. Set <code>SIGNUP.action</code> in site.js.</p>
+                    <p class="dev-note" id="signup-note" hidden>Local preview: the form isn't connected yet. Set <code>SIGNUP.action</code> (or <code>SIGNUP.link</code>) in site/site.js.</p>
                     <label class="field"><span>Email</span>
                         <input type="email" name="email" autocomplete="email" placeholder="you@example.com" required>
                     </label>
@@ -200,6 +200,11 @@
                     <button class="button b-ink" type="submit">Sign up</button>
                     <p class="fine-print">No spam. Unsubscribe any time.</p>
                 </form>
+                <div class="signup signup-link" id="signup-link" hidden>
+                    <p>Pick what you'd like to hear about, or ask to join the testing group. It takes a minute.</p>
+                    <a class="button b-ink" id="signup-link-btn" href="#" target="_blank" rel="noopener">Sign up</a>
+                    <p class="fine-print">No spam. You can opt out any time.</p>
+                </div>
             </div>
         </section>
     </main>

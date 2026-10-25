@@ -9,13 +9,15 @@
     // everything this script loads (examples.json, posters, clips) lives next to it, wherever the HTML page sits
     var BASE = document.currentScript.src.replace(/[^/]*$/, '')
 
-    // ── sign-up form ───────────────────────────────────────────────────────────────────────────────
-    // Paste your provider's form endpoint here and the "Stay in the loop" section goes live on the real site.
+    // ── sign-up ("Stay in the loop") ───────────────────────────────────────────────────────────────
+    // The section stays hidden until ONE of these is filled in (hidden on localhost it shows with a note instead):
+    //   action — a form endpoint the built-in form posts to (recommended: Buttondown, below). Collects email + interest tags.
+    //   link   — the address of a form hosted elsewhere (e.g. a Google Form's "Send → link"); the section then shows a button.
     //   Buttondown:  https://buttondown.email/api/emails/embed-subscribe/YOUR-NAME   (fields: email, tag, embed)
     //   Formspree:   https://formspree.io/f/YOUR-ID                                  (fields: email, tag)
-    //   Mailchimp:   the action="" URL from its embedded-form HTML (field names differ — adjust name="" in index.html)
-    // Left empty, the section is hidden everywhere except localhost, where it shows with a note.
-    var SIGNUP = { action: '' }
+    //   Mailchimp:   the action="" URL from its embedded-form HTML (field names differ — adjust name="" in the page)
+    // Never put an API key here: this file is public. These endpoints are made to be public.
+    var SIGNUP = { action: '', link: 'https://docs.google.com/forms/d/e/1FAIpQLSfnLKqgZKvespQyFbW1iyo24eSuTtdG2LI1nd9GCMLFJG75xg/viewform' }
 
     var reduceMotion = window.matchMedia('(prefers-reduced-motion: reduce)').matches
     var $ = function (s, r) { return (r || document).querySelector(s) }
@@ -33,13 +35,15 @@
     })
 
     // ── sign-up section ──
-    var stay = $('#stay'), form = $('#signup'), note = $('#signup-note')
+    var stay = $('#stay'), form = $('#signup'), note = $('#signup-note'), linkBox = $('#signup-link')
     var isLocal = /^(localhost|127\.0\.0\.1|\[::1\])$/.test(location.hostname) || location.protocol === 'file:'
     if (SIGNUP.action) { form.action = SIGNUP.action; stay.hidden = false }
-    else if (isLocal) { stay.hidden = false; note.hidden = false }
+    else if (SIGNUP.link) {
+        form.hidden = true; linkBox.hidden = false; $('#signup-link-btn').href = SIGNUP.link; stay.hidden = false
+    } else if (isLocal) { stay.hidden = false; note.hidden = false }
     form.addEventListener('submit', function (e) {
         var email = form.elements.email
-        if (!SIGNUP.action) { e.preventDefault(); note.hidden = false; note.textContent = 'Local preview: nothing was sent. Set SIGNUP.action in site.js.'; return }
+        if (!SIGNUP.action) { e.preventDefault(); note.hidden = false; note.textContent = 'Local preview: nothing was sent. Set SIGNUP.action (or SIGNUP.link) in site.js.'; return }
         if (!email.value || !email.checkValidity()) { e.preventDefault(); email.focus(); email.reportValidity() }
     })
 
