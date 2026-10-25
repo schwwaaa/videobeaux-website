@@ -32,7 +32,7 @@
                 <a href="#everyone">For everyone</a>
                 <a href="#examples">Examples</a>
                 <a href="https://schwwaaa.github.io/videobeaux/docs.html" target="_blank" rel="noopener">Manual ↗</a>
-                <a class="nav-cta" href="#get">Get the app</a>
+                <a class="nav-cta" href="#get">Get alpha access</a>
             </div>
         </div>
     </nav>
@@ -41,7 +41,6 @@
 
         <!-- HERO -->
         <header class="hero" id="top">
-            <span class="deco d-tri" aria-hidden="true"></span>
             <span class="deco d-dots" aria-hidden="true"></span>
             <div class="shell hero-grid">
                 <div class="hero-copy">
@@ -49,8 +48,8 @@
                     <h1>Patch video. <span class="punch">Watch it change.</span></h1>
                     <p class="lede">Drag program modes onto a canvas. Connect them. Press Run. 155 to choose from, no timeline, no terminal.</p>
                     <div class="button-row">
-                        <a class="button b-yellow" href="#get">Get the app</a>
-                        <a class="button b-paper" href="https://schwwaaa.github.io/videobeaux/docs.html" target="_blank" rel="noopener">Read the manual</a>
+                        <a class="button b-yellow" href="#get">Get alpha access</a>
+                        <a class="button b-paper" href="https://schwwaaa.github.io/videobeaux/docs.html" target="_blank" rel="noopener">Use the CLI</a>
                     </div>
                     <p class="fine">macOS &amp; Windows · runs on your computer, offline</p>
                 </div>
@@ -103,7 +102,6 @@
 
         <!-- FOR EVERYONE -->
         <section class="section" id="everyone" aria-labelledby="everyone-h">
-            <span class="deco d-squig" aria-hidden="true"></span>
             <div class="shell">
                 <div class="heading">
                     <p class="sticker s-coral">For everyone</p>
@@ -161,27 +159,12 @@
             </div>
         </section>
 
-        <!-- GET -->
-        <section class="section s-ink" id="get" aria-labelledby="get-h">
-            <span class="deco d-tri2" aria-hidden="true"></span>
-            <div class="shell get">
-                <div>
-                    <h2 id="get-h">Get Videobeaux.</h2>
-                    <p>It runs on your computer. Your videos stay there.</p>
-                </div>
-                <div class="button-row">
-                    <a class="button b-yellow" href="https://github.com/schwwaaa/videobeaux/releases/latest" target="_blank" rel="noopener">Download for macOS</a>
-                    <a class="button b-yellow" href="https://github.com/schwwaaa/videobeaux/releases/latest" target="_blank" rel="noopener">Download for Windows</a>
-                    <a class="button b-paper" href="https://schwwaaa.github.io/videobeaux/docs.html" target="_blank" rel="noopener">Read the manual</a>
-                </div>
-            </div>
-        </section>
-        <!-- STAY IN THE LOOP — see SIGNUP at the top of site/site.js (Google Form behind the scenes; hidden until configured) -->
-        <section class="section s-yellow" id="stay" aria-labelledby="stay-h" hidden>
+        <!-- GET ALPHA ACCESS — see SIGNUP at the top of site/site.js (Google Form behind the scenes) -->
+        <section class="section s-yellow" id="get" aria-labelledby="get-h">
             <div class="shell stay">
                 <div>
-                    <h2 id="stay-h">Stay in the loop.</h2>
-                    <p>New program modes, new builds, and the occasional good idea. Or join the testing group and try things early.</p>
+                    <h2 id="get-h">Get alpha access.</h2>
+                    <p>Videobeaux runs on your computer, and your videos stay there. Leave your email and we'll reach out personally with the files and instructions.</p>
                 </div>
                 <form class="signup" id="signup" method="post" target="_blank" novalidate>
                     <p class="dev-note" id="signup-note" hidden>Local preview: the form isn't connected yet. Fill in <code>SIGNUP</code> in site/site.js (see the README).</p>
@@ -190,15 +173,15 @@
                     </label>
                     <fieldset>
                         <legend>I'd like</legend>
-                        <label class="check"><input type="checkbox" name="tag" value="newsletter" checked> <span>Updates and news</span></label>
-                        <label class="check"><input type="checkbox" name="tag" value="testers"> <span>To join the testing group</span></label>
+                        <label class="check"><input type="checkbox" name="tag" value="newsletter"> <span>Updates and news</span></label>
+                        <label class="check"><input type="checkbox" name="tag" value="testers" checked> <span>Alpha access (the testing group)</span></label>
                     </fieldset>
                     <input type="hidden" name="embed" value="1">
                     <input class="hp" type="text" name="_gotcha" tabindex="-1" autocomplete="off" aria-hidden="true">
                     <div class="signup-captcha" id="signup-captcha" hidden></div>
-                    <button class="button b-ink" type="submit" id="signup-btn">Sign up</button>
+                    <button class="button b-ink" type="submit" id="signup-btn">Request access</button>
                     <p class="signup-status" id="signup-status" role="status" aria-live="polite"></p>
-                    <p class="fine-print">No spam. We only use your email for Videobeaux news.</p>
+                    <p class="fine-print">No spam. We only use your email to contact you about Videobeaux.</p>
                 </form>
             </div>
         </section>
