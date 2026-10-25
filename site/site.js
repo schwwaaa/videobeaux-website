@@ -30,8 +30,8 @@
             labels: { newsletter: 'Updates and news', testers: 'Join the testing group' }   // option text, exactly
         },
         // 2 — hardened (leave '' until the Worker is deployed; then the google block above can be emptied)
-        endpoint: '',                           // e.g. https://videobeaux-signup.YOUR-NAME.workers.dev
-        turnstile: ''                           // the Turnstile *site* key (public) for that Worker
+        endpoint: 'https://videobeaux-signup.workers.dev',                           // e.g. https://videobeaux-signup.YOUR-NAME.workers.dev
+        turnstile: '0x4AAAAAAFk5eVrOCAT1GcTK'                           // the Turnstile *site* key (public) for that Worker
     }
 
     var reduceMotion = window.matchMedia('(prefers-reduced-motion: reduce)').matches
