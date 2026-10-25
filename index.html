@@ -176,9 +176,7 @@
                 </div>
             </div>
         </section>
-        <!-- STAY IN THE LOOP -->
-        <!-- Set SIGNUP.action (a form endpoint) or SIGNUP.link (a hosted form's address) in site/site.js and this section goes live.
-             Until then it only shows on localhost, with a note. -->
+        <!-- STAY IN THE LOOP — see SIGNUP at the top of site/site.js (Google Form behind the scenes; hidden until configured) -->
         <section class="section s-yellow" id="stay" aria-labelledby="stay-h" hidden>
             <div class="shell stay">
                 <div>
@@ -186,7 +184,7 @@
                     <p>New program modes, new builds, and the occasional good idea. Or join the testing group and try things early.</p>
                 </div>
                 <form class="signup" id="signup" method="post" target="_blank" novalidate>
-                    <p class="dev-note" id="signup-note" hidden>Local preview: the form isn't connected yet. Set <code>SIGNUP.action</code> (or <code>SIGNUP.link</code>) in site/site.js.</p>
+                    <p class="dev-note" id="signup-note" hidden>Local preview: the form isn't connected yet. Fill in <code>SIGNUP</code> in site/site.js.</p>
                     <label class="field"><span>Email</span>
                         <input type="email" name="email" autocomplete="email" placeholder="you@example.com" required>
                     </label>
@@ -197,13 +195,14 @@
                     </fieldset>
                     <input type="hidden" name="embed" value="1">
                     <input class="hp" type="text" name="_gotcha" tabindex="-1" autocomplete="off" aria-hidden="true">
-                    <button class="button b-ink" type="submit">Sign up</button>
-                    <p class="fine-print">No spam. Unsubscribe any time.</p>
+                    <button class="button b-ink" type="submit" id="signup-btn">Sign up</button>
+                    <p class="signup-status" id="signup-status" role="status" aria-live="polite"></p>
+                    <p class="fine-print">No spam. We only use your email for Videobeaux news.</p>
                 </form>
                 <div class="signup signup-link" id="signup-link" hidden>
                     <p>Pick what you'd like to hear about, or ask to join the testing group. It takes a minute.</p>
                     <a class="button b-ink" id="signup-link-btn" href="#" target="_blank" rel="noopener">Sign up</a>
-                    <p class="fine-print">No spam. You can opt out any time.</p>
+                    <p class="fine-print">No spam. We only use your email for Videobeaux news.</p>
                 </div>
             </div>
         </section>

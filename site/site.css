@@ -187,6 +187,9 @@ output { font: 700 .85rem var(--mono); white-space: nowrap; }
 .b-ink { background: var(--ink); color: var(--paper); border-color: var(--ink); box-shadow: 6px 6px 0 var(--magenta); }
 .fine-print { margin: 0 !important; font: .8rem var(--mono) !important; font-weight: 400 !important; }
 .signup-link p:not(.fine-print) { margin: 0; font-size: 1.05rem; font-weight: 400; }
+.signup-status { margin: 0 !important; min-height: 1.4em; font: 700 .9rem var(--mono) !important; }
+.signup-status.good { color: #0a6b2a; }
+.signup-status.bad { color: #b3261e; }
 .dev-note { margin: 0 !important; padding: 8px 10px; font: .8rem var(--mono) !important; font-weight: 400 !important; background: var(--cyan); border: 3px dashed var(--ink); }
 .hp { position: absolute; left: -9999px; width: 1px; height: 1px; opacity: 0; }
 

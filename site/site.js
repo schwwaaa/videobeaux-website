@@ -10,14 +10,29 @@
     var BASE = document.currentScript.src.replace(/[^/]*$/, '')
 
     // ── sign-up ("Stay in the loop") ───────────────────────────────────────────────────────────────
-    // The section stays hidden until ONE of these is filled in (hidden on localhost it shows with a note instead):
-    //   action — a form endpoint the built-in form posts to (recommended: Buttondown, below). Collects email + interest tags.
-    //   link   — the address of a form hosted elsewhere (e.g. a Google Form's "Send → link"); the section then shows a button.
-    //   Buttondown:  https://buttondown.email/api/emails/embed-subscribe/YOUR-NAME   (fields: email, tag, embed)
-    //   Formspree:   https://formspree.io/f/YOUR-ID                                  (fields: email, tag)
-    //   Mailchimp:   the action="" URL from its embedded-form HTML (field names differ — adjust name="" in the page)
-    // Never put an API key here: this file is public. These endpoints are made to be public.
-    var SIGNUP = { action: '', link: 'https://docs.google.com/forms/d/e/1FAIpQLSfnLKqgZKvespQyFbW1iyo24eSuTtdG2LI1nd9GCMLFJG75xg/viewform' }
+    // The form on the page posts straight to a Google Form, so replies land in its Google Sheet (Responses tab → Link to Sheets)
+    // and visitors never see Google's form page. The IDs below are public by nature (they are in the form's page source); there
+    // is no key or password anywhere in this file. In the Google Form: an "Email" short-answer question (required) and a
+    // "Checkboxes" question whose options are exactly the labels below; don't require sign-in or limit to one response.
+    //   google.form     the form's responder link (…/viewform) — used as a fallback if posting fails, or on its own as a plain
+    //                   "Sign up" button while google.email is still empty
+    //   google.action   the same address with /viewform replaced by /formResponse
+    //   google.email    the Email question's field name   (entry.123456789)
+    //   google.interest the checkboxes question's field name
+    //   google.labels   the checkbox option text for each choice on the page (must match exactly, including capitals)
+    // To find the field names: open the form's responder link, view the page source and search for "entry." — or ask for help.
+    // Alternative: `action` — any ordinary form endpoint (Buttondown, Formspree …) that accepts a normal POST; the page's fields
+    // are email, tag (repeatable), embed and the honeypot _gotcha.
+    var SIGNUP = {
+        google: {
+            form: 'https://docs.google.com/forms/d/e/1FAIpQLSfnLKqgZKvespQyFbW1iyo24eSuTtdG2LI1nd9GCMLFJG75xg/viewform',
+            action: 'https://docs.google.com/forms/d/e/1FAIpQLSfnLKqgZKvespQyFbW1iyo24eSuTtdG2LI1nd9GCMLFJG75xg/formResponse',
+            email: '',
+            interest: 'entry.1536578059',
+            labels: { newsletter: 'Updates and news', testers: 'Join the testing group' }
+        },
+        action: ''
+    }
 
     var reduceMotion = window.matchMedia('(prefers-reduced-motion: reduce)').matches
     var $ = function (s, r) { return (r || document).querySelector(s) }
@@ -36,15 +51,38 @@
 
     // ── sign-up section ──
     var stay = $('#stay'), form = $('#signup'), note = $('#signup-note'), linkBox = $('#signup-link')
+    var statusEl = $('#signup-status'), signBtn = $('#signup-btn'), pageLoaded = Date.now()
     var isLocal = /^(localhost|127\.0\.0\.1|\[::1\])$/.test(location.hostname) || location.protocol === 'file:'
-    if (SIGNUP.action) { form.action = SIGNUP.action; stay.hidden = false }
-    else if (SIGNUP.link) {
-        form.hidden = true; linkBox.hidden = false; $('#signup-link-btn').href = SIGNUP.link; stay.hidden = false
-    } else if (isLocal) { stay.hidden = false; note.hidden = false }
+    var G = SIGNUP.google || {}
+    var mode = (G.action && G.email && G.interest) ? 'google' : SIGNUP.action ? 'post' : G.form ? 'link' : ''
+    if (mode === 'post') form.action = SIGNUP.action
+    if (mode === 'link') { form.hidden = true; linkBox.hidden = false; $('#signup-link-btn').href = G.form }
+    if (mode) stay.hidden = false
+    else if (isLocal) { stay.hidden = false; note.hidden = false }
+
+    function say(text, bad) { statusEl.textContent = text; statusEl.className = 'signup-status' + (bad ? ' bad' : ' good') }
     form.addEventListener('submit', function (e) {
         var email = form.elements.email
-        if (!SIGNUP.action) { e.preventDefault(); note.hidden = false; note.textContent = 'Local preview: nothing was sent. Set SIGNUP.action (or SIGNUP.link) in site.js.'; return }
-        if (!email.value || !email.checkValidity()) { e.preventDefault(); email.focus(); email.reportValidity() }
+        var valid = email.value && email.checkValidity()
+        if (!mode) { e.preventDefault(); note.hidden = false; note.textContent = 'Local preview: nothing was sent. Fill in SIGNUP in site/site.js.'; return }
+        if (!valid) { e.preventDefault(); email.focus(); say('Please enter a valid email address.', true); return }
+        var tags = Array.prototype.map.call(form.querySelectorAll('input[name=tag]:checked'), function (c) { return c.value })
+        if (!tags.length) { e.preventDefault(); say('Choose at least one option.', true); return }
+        if (mode !== 'google') return                              // ordinary POST to the provider (opens in a new tab)
+        e.preventDefault()
+        // bots fill the hidden field or submit instantly; pretend it worked and send nothing
+        if (form.elements._gotcha.value || Date.now() - pageLoaded < 2500) { say('Thanks! You’re on the list.'); form.reset(); return }
+        var body = new URLSearchParams()
+        body.append(G.email, email.value.trim())
+        tags.forEach(function (t) { body.append(G.interest, (G.labels || {})[t] || t) })
+        signBtn.disabled = true; say('Sending…')
+        // no-cors: Google doesn't allow reading the reply, so a resolved request is treated as success
+        fetch(G.action, { method: 'POST', mode: 'no-cors', body: body }).then(function () {
+            say('Thanks! You’re on the list.'); form.reset(); signBtn.disabled = false
+        }).catch(function () {
+            signBtn.disabled = false
+            say('Couldn’t send that. Check your connection and try again.', true)
+        })
     })
 
     // ── player ──
