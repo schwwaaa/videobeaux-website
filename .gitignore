@@ -1,0 +1,65 @@
+# ── macOS ────────────────────────────────────────────────
+.DS_Store
+.AppleDouble
+.LSOverride
+._*
+.Spotlight-V100
+.Trashes
+.fseventsd
+.TemporaryItems
+.DocumentRevisions-V100
+.VolumeIcon.icns
+
+# ── Windows ──────────────────────────────────────────────
+Thumbs.db
+ehthumbs.db
+Desktop.ini
+$RECYCLE.BIN/
+
+# ── Linux ────────────────────────────────────────────────
+*~
+.directory
+.Trash-*
+
+# ── Editors / IDEs ───────────────────────────────────────
+.vscode/
+.idea/
+*.swp
+*.swo
+*.sublime-workspace
+*.code-workspace
+
+# ── Logs, temp and scratch files ─────────────────────────
+*.log
+*.tmp
+*.bak
+*.orig
+*.rej
+tmp/
+temp/
+scratch/
+_scratch/
+
+# ── Secrets and local config (never commit these) ────────
+.env
+.env.*
+*.pem
+*.key
+
+# ── Tooling that may appear if the site grows ────────────
+node_modules/
+.npm/
+.cache/
+.parcel-cache/
+.sass-cache/
+.jekyll-cache/
+.jekyll-metadata
+_site/
+__pycache__/
+*.pyc
+.venv/
+venv/
+
+# ── Deliberately NOT ignored ─────────────────────────────
+# Videos, images, fonts and the site/ folder are published content — don't add *.mp4, *.webp, site/ or similar here.
+# Git only uploads files that changed, so editing text never re-uploads the unchanged videos.
