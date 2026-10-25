@@ -1,0 +1,20 @@
+# Deploy:  cd tools/signup-worker && npx wrangler deploy      (free Cloudflare account; see README.md)
+name = "videobeaux-signup"
+main = "worker.js"
+compatibility_date = "2025-01-01"
+
+[vars]
+ALLOWED_ORIGINS = "https://videobeaux.online"
+GOOGLE_ACTION = "https://docs.google.com/forms/d/e/1FAIpQLSfnLKqgZKvespQyFbW1iyo24eSuTtdG2LI1nd9GCMLFJG75xg/formResponse"
+ENTRY_EMAIL = "entry.1349102305"
+ENTRY_INTEREST = "entry.1536578059"
+LABELS = '{"newsletter":"Updates and news","testers":"Join the testing group"}'
+
+# per-IP limit: 3 sign-ups per minute
+[[unsafe.bindings]]
+name = "RATE_LIMITER"
+type = "ratelimit"
+namespace_id = "1001"
+simple = { limit = 3, period = 60 }
+
+# secret (not in this file):  npx wrangler secret put TURNSTILE_SECRET

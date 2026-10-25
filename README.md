@@ -15,6 +15,7 @@ site/
 ├── shots/          app screenshots (made by tools/site-harness/shots.sh in the videobeaux-gui repo)
 └── previews/       example clips, posters and examples.json (made by tools/render-site-examples.py in videobeaux-gui)
 tools/serve.py      local test server
+tools/signup-worker/  optional Cloudflare Worker for the hardened sign-up (worker.js, wrangler.toml, test.mjs, README.md)
 ```
 
 ## Work on it
@@ -53,29 +54,36 @@ The page reads `site/previews/examples.json`, so a new example appears as soon a
 
 ## The sign-up form ("Stay in the loop")
 
-The form on the page posts straight to a **Google Form**, so replies collect in its Google Sheet and visitors never see Google's page.
-Everything is set in `SIGNUP` at the top of `site/site.js`:
+The form is on the page; the answers go to a **Google Form** and collect in its Google Sheet (Responses tab → *Link to Sheets*, plus
+*Get email notifications*). Visitors never see Google's form page. It is configured in `SIGNUP` at the top of `site/site.js`, in one of two ways:
 
-| Key | What it is |
-|---|---|
-| `google.form` | the form's responder link (`…/viewform`); used as a "Sign up" button until `google.email` is filled in, and as the fallback if posting fails |
-| `google.action` | the same address ending in `/formResponse` |
-| `google.email` | field name of the form's **Email** question (`entry.123456789`) |
-| `google.interest` | field name of the **Checkboxes** question |
-| `google.labels` | the checkbox option text for each choice on the page (must match exactly) |
+| | **Direct** (live now) | **Hardened** (optional upgrade) |
+|---|---|---|
+| Path | page → Google Form `/formResponse` | page → your Cloudflare Worker → Google Form |
+| Set | `google.action`, `google.email`, `google.interest`, `google.labels` | `endpoint` (+ `turnstile` site key) |
+| Google form address visible on the site | yes (in `site.js`) | no (only inside the Worker's settings) |
+| CAPTCHA | no | yes (Cloudflare Turnstile, verified server-side) |
+| Per-IP rate limit | only a per-browser cooldown | yes (3 per minute per IP) + the browser cooldown |
+| Server-side validation | Google's (email question validation) | the Worker's (email format, size, allowed choices) + Google's |
+| Knows if it really saved | no (Google hides the reply) | yes (shows an error when it didn't) |
+| Setup | none | free Cloudflare account, ~10 minutes (`tools/signup-worker/README.md`) |
 
-**In the Google Form:** an *Email* short-answer question (required; Response validation → Email), and a **Checkboxes** question (not Multiple choice)
-with the options *Updates and news* and *Join the testing group*. Don't require sign-in and leave "Limit to 1 response" off. On the Responses tab:
-*Link to Sheets*, and *Get email notifications*. If you change a question, its `entry.…` name changes — find it by opening the form's responder link,
-viewing the page source and searching for `entry.`.
+**Google Form requirements:** an **Email** short-answer question (required, Response validation → Email address) and a **Checkboxes** question (not
+Multiple choice) with the options *Updates and news* and *Join the testing group*. Don't require sign-in; leave "Limit to 1 response" off; don't turn on
+"Collect email addresses". If you edit a question, its `entry.…` name changes — open the form's responder link, view the page source and search for `entry.`.
 
-**Security:** no key or password is involved — the form id and `entry.` names are public by nature (anyone can read them in the form's page source).
-The page checks the email, ignores a hidden "honeypot" field and instant submits, and Google validates again on its side. Anyone *can* post to a public
-Google Form directly, exactly as with the form's own link, so expect the occasional junk row; if spam becomes a problem, move to a provider with
-CAPTCHA (Buttondown, Formspree, MailerLite) via `SIGNUP.action`. A Google Form can collect replies but not send mail or unsubscribe people: copy the
-addresses into a mailing tool when you start sending updates.
+**What protects it (both modes):** the page checks the email (format, length), needs at least one choice, ignores a hidden honeypot field and
+instant (<2.5 s) submits, locks the button while sending, and remembers a successful sign-up in the browser for 10 minutes. The hardened mode adds
+the CAPTCHA, the per-IP limit and server-side checks, and hides the Google form entirely.
 
-Until `SIGNUP` is filled in the section stays hidden on the live site; on localhost it shows with a note.
+**Honest limits.** There is no key or password to steal: a static site can't hold secrets, and the form id / `entry.` names are public by nature in
+direct mode. In direct mode anyone who reads the page source can post to the Google Form directly, so expect an occasional junk row (delete it in the
+Sheet). The traffic itself can't "slam" your site — the page is served by GitHub's CDN and the posts go to Google, which rate-limits and absorbs
+abuse; nothing of yours can be taken down. If junk rows start appearing, switch to the hardened mode. A Google Form collects replies but can't send
+mail or unsubscribe people: copy the addresses into a mailing tool when you start sending updates (the page promises only "No spam. We only use your
+email for Videobeaux news.").
+
+Until `SIGNUP` is configured the section stays hidden on the live site; on localhost it shows with a note.
 
 ## Notes
 

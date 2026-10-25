@@ -184,7 +184,7 @@
                     <p>New program modes, new builds, and the occasional good idea. Or join the testing group and try things early.</p>
                 </div>
                 <form class="signup" id="signup" method="post" target="_blank" novalidate>
-                    <p class="dev-note" id="signup-note" hidden>Local preview: the form isn't connected yet. Fill in <code>SIGNUP</code> in site/site.js.</p>
+                    <p class="dev-note" id="signup-note" hidden>Local preview: the form isn't connected yet. Fill in <code>SIGNUP</code> in site/site.js (see the README).</p>
                     <label class="field"><span>Email</span>
                         <input type="email" name="email" autocomplete="email" placeholder="you@example.com" required>
                     </label>
@@ -195,15 +195,11 @@
                     </fieldset>
                     <input type="hidden" name="embed" value="1">
                     <input class="hp" type="text" name="_gotcha" tabindex="-1" autocomplete="off" aria-hidden="true">
+                    <div class="signup-captcha" id="signup-captcha" hidden></div>
                     <button class="button b-ink" type="submit" id="signup-btn">Sign up</button>
                     <p class="signup-status" id="signup-status" role="status" aria-live="polite"></p>
                     <p class="fine-print">No spam. We only use your email for Videobeaux news.</p>
                 </form>
-                <div class="signup signup-link" id="signup-link" hidden>
-                    <p>Pick what you'd like to hear about, or ask to join the testing group. It takes a minute.</p>
-                    <a class="button b-ink" id="signup-link-btn" href="#" target="_blank" rel="noopener">Sign up</a>
-                    <p class="fine-print">No spam. We only use your email for Videobeaux news.</p>
-                </div>
             </div>
         </section>
     </main>

@@ -10,28 +10,28 @@
     var BASE = document.currentScript.src.replace(/[^/]*$/, '')
 
     // ── sign-up ("Stay in the loop") ───────────────────────────────────────────────────────────────
-    // The form on the page posts straight to a Google Form, so replies land in its Google Sheet (Responses tab → Link to Sheets)
-    // and visitors never see Google's form page. The IDs below are public by nature (they are in the form's page source); there
-    // is no key or password anywhere in this file. In the Google Form: an "Email" short-answer question (required) and a
-    // "Checkboxes" question whose options are exactly the labels below; don't require sign-in or limit to one response.
-    //   google.form     the form's responder link (…/viewform) — used as a fallback if posting fails, or on its own as a plain
-    //                   "Sign up" button while google.email is still empty
-    //   google.action   the same address with /viewform replaced by /formResponse
-    //   google.email    the Email question's field name   (entry.123456789)
-    //   google.interest the checkboxes question's field name
-    //   google.labels   the checkbox option text for each choice on the page (must match exactly, including capitals)
-    // To find the field names: open the form's responder link, view the page source and search for "entry." — or ask for help.
-    // Alternative: `action` — any ordinary form endpoint (Buttondown, Formspree …) that accepts a normal POST; the page's fields
-    // are email, tag (repeatable), embed and the honeypot _gotcha.
+    // The form on the page sends its answers to a Google Form, so replies collect in that form's Google Sheet. Visitors never see
+    // Google's form page. Two ways to send, set here (README → "The sign-up form" explains both and the security trade-offs):
+    //
+    //  1. DIRECT (works today): the page posts to the Google Form's /formResponse address. The form id and `entry.` field names
+    //     below are public by nature (anyone can read them in the form's page source) — there is no key or password in this file.
+    //  2. HARDENED (optional): set `endpoint` (and `turnstile`) to a small Cloudflare Worker (tools/signup-worker/). The page then
+    //     talks only to the Worker, which checks a Turnstile CAPTCHA, rate-limits per IP, validates the input and forwards it to
+    //     Google — so the Google form's address never appears in the page at all.
+    //
+    // In the Google Form: an Email short-answer question (required, validated as an email) and a Checkboxes question whose options are
+    // exactly the labels below; don't require sign-in or limit to one response. The section stays hidden until one way is configured.
     var SIGNUP = {
+        // 1 — direct
         google: {
-            form: 'https://docs.google.com/forms/d/e/1FAIpQLSfnLKqgZKvespQyFbW1iyo24eSuTtdG2LI1nd9GCMLFJG75xg/viewform',
             action: 'https://docs.google.com/forms/d/e/1FAIpQLSfnLKqgZKvespQyFbW1iyo24eSuTtdG2LI1nd9GCMLFJG75xg/formResponse',
-            email: '',
-            interest: 'entry.1536578059',
-            labels: { newsletter: 'Updates and news', testers: 'Join the testing group' }
+            email: 'entry.1349102305',          // the "Email" question
+            interest: 'entry.1536578059',       // the "interest" checkboxes
+            labels: { newsletter: 'Updates and news', testers: 'Join the testing group' }   // option text, exactly
         },
-        action: ''
+        // 2 — hardened (leave '' until the Worker is deployed; then the google block above can be emptied)
+        endpoint: '',                           // e.g. https://videobeaux-signup.YOUR-NAME.workers.dev
+        turnstile: ''                           // the Turnstile *site* key (public) for that Worker
     }
 
     var reduceMotion = window.matchMedia('(prefers-reduced-motion: reduce)').matches
@@ -50,39 +50,78 @@
     })
 
     // ── sign-up section ──
-    var stay = $('#stay'), form = $('#signup'), note = $('#signup-note'), linkBox = $('#signup-link')
-    var statusEl = $('#signup-status'), signBtn = $('#signup-btn'), pageLoaded = Date.now()
+    var stay = $('#stay'), form = $('#signup'), note = $('#signup-note')
+    var statusEl = $('#signup-status'), signBtn = $('#signup-btn'), captchaEl = $('#signup-captcha'), pageLoaded = Date.now()
     var isLocal = /^(localhost|127\.0\.0\.1|\[::1\])$/.test(location.hostname) || location.protocol === 'file:'
     var G = SIGNUP.google || {}
-    var mode = (G.action && G.email && G.interest) ? 'google' : SIGNUP.action ? 'post' : G.form ? 'link' : ''
-    if (mode === 'post') form.action = SIGNUP.action
-    if (mode === 'link') { form.hidden = true; linkBox.hidden = false; $('#signup-link-btn').href = G.form }
+    var mode = SIGNUP.endpoint ? 'worker' : (G.action && G.email && G.interest) ? 'google' : ''
+    var COOLDOWN = 10 * 60 * 1000, KEY = 'vb.signup'
     if (mode) stay.hidden = false
     else if (isLocal) { stay.hidden = false; note.hidden = false }
 
     function say(text, bad) { statusEl.textContent = text; statusEl.className = 'signup-status' + (bad ? ' bad' : ' good') }
+    function recentlyJoined() { try { return Date.now() - Number(localStorage.getItem(KEY)) < COOLDOWN } catch (e) { return false } }
+    function remember() { try { localStorage.setItem(KEY, String(Date.now())) } catch (e) { /* private mode */ } }
+    function done() { say('Thanks! You’re on the list.'); form.reset(); remember(); signBtn.disabled = false }
+
+    // Turnstile (hardened mode): load Cloudflare's script only when the form is near the screen
+    var turnstileId = null
+    function setupCaptcha() {
+        if (mode !== 'worker' || !SIGNUP.turnstile) return
+        var load = function () {
+            if (turnstileId !== null || document.getElementById('cf-turnstile-script')) return
+            window.__vbTurnstileReady = function () {
+                captchaEl.hidden = false
+                turnstileId = window.turnstile.render(captchaEl, { sitekey: SIGNUP.turnstile, size: 'flexible', theme: 'light' })
+            }
+            var s = document.createElement('script')
+            s.id = 'cf-turnstile-script'; s.async = true
+            s.src = 'https://challenges.cloudflare.com/turnstile/v0/api.js?render=explicit&onload=__vbTurnstileReady'
+            document.head.appendChild(s)
+        }
+        if ('IntersectionObserver' in window) {
+            new IntersectionObserver(function (en, io) { if (en[0].isIntersecting) { load(); io.disconnect() } }, { rootMargin: '400px' }).observe(stay)
+        } else load()
+    }
+    setupCaptcha()
+
     form.addEventListener('submit', function (e) {
-        var email = form.elements.email
-        var valid = email.value && email.checkValidity()
-        if (!mode) { e.preventDefault(); note.hidden = false; note.textContent = 'Local preview: nothing was sent. Fill in SIGNUP in site/site.js.'; return }
-        if (!valid) { e.preventDefault(); email.focus(); say('Please enter a valid email address.', true); return }
-        var tags = Array.prototype.map.call(form.querySelectorAll('input[name=tag]:checked'), function (c) { return c.value })
-        if (!tags.length) { e.preventDefault(); say('Choose at least one option.', true); return }
-        if (mode !== 'google') return                              // ordinary POST to the provider (opens in a new tab)
         e.preventDefault()
+        var email = form.elements.email, address = email.value.trim().toLowerCase()
+        if (!mode) { note.hidden = false; note.textContent = 'Local preview: nothing was sent. Fill in SIGNUP in site/site.js.'; return }
+        if (!address || address.length > 254 || !email.checkValidity()) { email.focus(); say('Please enter a valid email address.', true); return }
+        var tags = Array.prototype.map.call(form.querySelectorAll('input[name=tag]:checked'), function (c) { return c.value })
+        if (!tags.length) { say('Choose at least one option.', true); return }
+        if (signBtn.disabled) return
+        if (recentlyJoined()) { say('You’re already on the list. Thanks!'); return }
         // bots fill the hidden field or submit instantly; pretend it worked and send nothing
-        if (form.elements._gotcha.value || Date.now() - pageLoaded < 2500) { say('Thanks! You’re on the list.'); form.reset(); return }
-        var body = new URLSearchParams()
-        body.append(G.email, email.value.trim())
-        tags.forEach(function (t) { body.append(G.interest, (G.labels || {})[t] || t) })
+        if (form.elements._gotcha.value || Date.now() - pageLoaded < 2500) { done(); return }
         signBtn.disabled = true; say('Sending…')
-        // no-cors: Google doesn't allow reading the reply, so a resolved request is treated as success
-        fetch(G.action, { method: 'POST', mode: 'no-cors', body: body }).then(function () {
-            say('Thanks! You’re on the list.'); form.reset(); signBtn.disabled = false
-        }).catch(function () {
-            signBtn.disabled = false
-            say('Couldn’t send that. Check your connection and try again.', true)
-        })
+
+        if (mode === 'worker') {
+            var token = (window.turnstile && turnstileId !== null) ? window.turnstile.getResponse(turnstileId) : ''
+            if (SIGNUP.turnstile && !token) { signBtn.disabled = false; say('Please complete the check above.', true); return }
+            fetch(SIGNUP.endpoint, { method: 'POST', headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify({ email: address, tags: tags, token: token }) })
+                .then(function (r) { return r.json().catch(function () { return {} }).then(function (j) { return { ok: r.ok && j.ok, j: j } }) })
+                .then(function (res) {
+                    if (res.ok) { done() } else {
+                        signBtn.disabled = false
+                        say(res.j && res.j.error ? res.j.error : 'Couldn’t send that. Please try again in a moment.', true)
+                    }
+                    if (window.turnstile && turnstileId !== null) window.turnstile.reset(turnstileId)
+                })
+                .catch(function () { signBtn.disabled = false; say('Couldn’t reach the sign-up service. Check your connection and try again.', true) })
+            return
+        }
+
+        var body = new URLSearchParams()
+        body.append(G.email, address)
+        tags.forEach(function (t) { body.append(G.interest, (G.labels || {})[t] || t) })
+        // no-cors: Google doesn't allow reading the reply, so a request that goes through is treated as success
+        fetch(G.action, { method: 'POST', mode: 'no-cors', body: body })
+            .then(done)
+            .catch(function () { signBtn.disabled = false; say('Couldn’t send that. Check your connection and try again.', true) })
     })
 
     // ── player ──
