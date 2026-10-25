@@ -94,7 +94,7 @@
         if (signBtn.disabled) return
         if (recentlyJoined()) { say('You’re already on the list. Thanks!'); return }
         // bots fill the hidden field or submit instantly; pretend it worked and send nothing
-        if (form.elements._gotcha.value || Date.now() - pageLoaded < 2500) { done(); return }
+        if (form.elements._gotcha.value || Date.now() - pageLoaded < 2500) { say('Thanks! You’re on the list.'); signBtn.disabled = false; return }
         signBtn.disabled = true; say('Sending…')
 
         if (mode === 'worker') {
