@@ -19,15 +19,15 @@
     //     talks only to the Worker, which checks a Turnstile CAPTCHA, rate-limits per IP, validates the input and forwards it to
     //     Google — so the Google form's address never appears in the page at all.
     //
-    // In the Google Form: an Email short-answer question (required, validated as an email) and a Checkboxes question whose options are
-    // exactly the labels below; don't require sign-in or limit to one response. The section stays hidden until one way is configured.
+    // In the Google Form: an Email short-answer question (required, validated as an email) and two optional text questions ("how did you
+    // hear" and "interest / use case"); don't require sign-in or limit to one response. The section stays hidden until one way is configured.
     var SIGNUP = {
         // 1 — direct
         google: {
-            action: 'https://docs.google.com/forms/d/e/1FAIpQLSfnLKqgZKvespQyFbW1iyo24eSuTtdG2LI1nd9GCMLFJG75xg/formResponse',
-            email: 'entry.1349102305',          // the "Email" question
-            interest: 'entry.1536578059',       // the "interest" checkboxes
-            labels: { newsletter: 'Updates and news', testers: 'Join the testing group' }   // option text, exactly
+            action: 'https://docs.google.com/forms/d/e/1FAIpQLSf2hKP4D4rYgXS2ovwQJ8-YDHmqIfD2nsbC8tH_nO_oefuOCg/formResponse',
+            email: 'entry.1552989964',          // the "Email" question
+            hear: 'entry.1830674465',           // "How did you hear about videobeaux?"
+            interest: 'entry.94340946'          // "Please describe your interest/ use case"
         },
         // 2 — hardened (leave '' until the Worker is deployed; then the google block above can be emptied)
         endpoint: 'https://videobeaux-signup.videobeaux-signup.workers.dev',                          // e.g. https://videobeaux-signup.YOUR-NAME.workers.dev
@@ -90,8 +90,7 @@
         var email = form.elements.email, address = email.value.trim().toLowerCase()
         if (!mode) { note.hidden = false; note.textContent = 'Local preview: nothing was sent. Fill in SIGNUP in site/site.js.'; return }
         if (!address || address.length > 254 || !email.checkValidity()) { email.focus(); say('Please enter a valid email address.', true); return }
-        var tags = Array.prototype.map.call(form.querySelectorAll('input[name=tag]:checked'), function (c) { return c.value })
-        if (!tags.length) { say('Choose at least one option.', true); return }
+        var hear = form.elements.hear.value.trim(), interest = form.elements.interest.value.trim()
         if (signBtn.disabled) return
         if (recentlyJoined()) { say('You’re already on the list. Thanks!'); return }
         // bots fill the hidden field or submit instantly; pretend it worked and send nothing
@@ -102,7 +101,7 @@
             var token = (window.turnstile && turnstileId !== null) ? window.turnstile.getResponse(turnstileId) : ''
             if (SIGNUP.turnstile && !token) { signBtn.disabled = false; say('Please complete the check above.', true); return }
             fetch(SIGNUP.endpoint, { method: 'POST', headers: { 'Content-Type': 'application/json' },
-                body: JSON.stringify({ email: address, tags: tags, token: token }) })
+                body: JSON.stringify({ email: address, hear: hear, interest: interest, token: token }) })
                 .then(function (r) { return r.json().catch(function () { return {} }).then(function (j) { return { ok: r.ok && j.ok, j: j } }) })
                 .then(function (res) {
                     if (res.ok) { done() } else {
@@ -117,7 +116,8 @@
 
         var body = new URLSearchParams()
         body.append(G.email, address)
-        tags.forEach(function (t) { body.append(G.interest, (G.labels || {})[t] || t) })
+        if (hear) body.append(G.hear, hear)
+        if (interest) body.append(G.interest, interest)
         // no-cors: Google doesn't allow reading the reply, so a request that goes through is treated as success
         fetch(G.action, { method: 'POST', mode: 'no-cors', body: body })
             .then(done)

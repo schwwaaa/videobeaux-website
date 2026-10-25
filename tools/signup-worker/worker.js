@@ -2,14 +2,15 @@
 //
 //   browser ──JSON──▶ this Worker ──checks──▶ Google Form (formResponse) ──▶ Google Sheet
 //
-// Checks before anything reaches Google: allowed website origin, JSON of a sensible size, valid email, known interest tags, a
+// Checks before anything reaches Google: allowed website origin, JSON of a sensible size, valid email, length-limited free text, a
 // Cloudflare Turnstile token (CAPTCHA, verified with Cloudflare), and a per-IP rate limit. The Google form address and its field
 // names live only in this Worker's settings — they never appear on the website.
 //
-// Settings (wrangler.toml [vars], plus the secret): GOOGLE_ACTION, ENTRY_EMAIL, ENTRY_INTEREST, LABELS (JSON), ALLOWED_ORIGINS
+// Settings (wrangler.toml [vars], plus the secret): GOOGLE_ACTION, ENTRY_EMAIL, ENTRY_HEAR, ENTRY_INTEREST, ALLOWED_ORIGINS
 // (comma-separated), TURNSTILE_SECRET (secret: `wrangler secret put TURNSTILE_SECRET`). Optional binding: RATE_LIMITER.
 
-const MAX_BODY = 2048
+const MAX_BODY = 4096
+const MAX_TEXT = 1000
 const EMAIL = /^[^\s@]{1,64}@[^\s@]{1,190}\.[^\s@]{2,}$/
 
 const json = (obj, status, origin) =>
@@ -48,12 +49,10 @@ export async function handle(request, env, fetchImpl = fetch) {
   let data
   try { data = JSON.parse(raw) } catch { return json({ ok: false, error: 'Bad request.' }, 400, okOrigin) }
   const email = typeof data.email === 'string' ? data.email.trim().toLowerCase() : ''
-  const tags = Array.isArray(data.tags) ? [...new Set(data.tags.map(String))] : []
-  const labels = (() => { try { return JSON.parse(env.LABELS || '{}') } catch { return {} } })()
+  const text = v => (typeof v === 'string' ? v.trim() : '')
+  const hear = text(data.hear), interest = text(data.interest)
   if (!email || email.length > 254 || !EMAIL.test(email)) return json({ ok: false, error: 'Please enter a valid email address.' }, 400, okOrigin)
-  if (!tags.length || tags.length > 5 || !tags.every(t => Object.prototype.hasOwnProperty.call(labels, t))) {
-    return json({ ok: false, error: 'Choose at least one option.' }, 400, okOrigin)
-  }
+  if (hear.length > MAX_TEXT || interest.length > MAX_TEXT) return json({ ok: false, error: 'Please keep your answers shorter.' }, 400, okOrigin)
 
   const ip = request.headers.get('CF-Connecting-IP') || ''
 
@@ -77,7 +76,8 @@ export async function handle(request, env, fetchImpl = fetch) {
   // forward to the Google Form
   const body = new URLSearchParams()
   body.append(env.ENTRY_EMAIL, email)
-  tags.forEach(t => body.append(env.ENTRY_INTEREST, labels[t]))
+  if (hear) body.append(env.ENTRY_HEAR, hear)
+  if (interest) body.append(env.ENTRY_INTEREST, interest)
   const g = await fetchImpl(env.GOOGLE_ACTION, { method: 'POST', body, redirect: 'manual' })
   // a successful Google Form submission answers 200, or 302 to the confirmation page
   if (!(g.status === 200 || (g.status >= 300 && g.status < 400) || g.type === 'opaqueredirect')) {

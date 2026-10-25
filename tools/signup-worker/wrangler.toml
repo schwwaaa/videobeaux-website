@@ -5,10 +5,10 @@ compatibility_date = "2025-01-01"
 
 [vars]
 ALLOWED_ORIGINS = "https://videobeaux.online"
-GOOGLE_ACTION = "https://docs.google.com/forms/d/e/1FAIpQLSfnLKqgZKvespQyFbW1iyo24eSuTtdG2LI1nd9GCMLFJG75xg/formResponse"
-ENTRY_EMAIL = "entry.1349102305"
-ENTRY_INTEREST = "entry.1536578059"
-LABELS = '{"newsletter":"Updates and news","testers":"Join the testing group"}'
+GOOGLE_ACTION = "https://docs.google.com/forms/d/e/1FAIpQLSf2hKP4D4rYgXS2ovwQJ8-YDHmqIfD2nsbC8tH_nO_oefuOCg/formResponse"
+ENTRY_EMAIL = "entry.1552989964"
+ENTRY_HEAR = "entry.1830674465"
+ENTRY_INTEREST = "entry.94340946"
 
 # per-IP limit: 3 sign-ups per minute
 [[unsafe.bindings]]
