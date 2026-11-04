@@ -12,11 +12,11 @@ ENTRY_INTEREST = "entry.94340946"
 
 # alpha feedback form (feedback.html → POST /feedback). Fill these in from the feedback Google Form's page source; until
 # FB_ACTION is set the Worker answers /feedback with "not set up yet".
-FB_ACTION = ""            # https://docs.google.com/forms/d/e/FORM_ID/formResponse
-FB_ENTRY_TYPE = ""        # entry.123456789 (the Bug / Feedback / Feature idea question)
-FB_ENTRY_SUMMARY = ""     # the long-answer report question
-FB_ENTRY_OS = ""          # the computer question
-FB_ENTRY_EMAIL = ""       # the email question
+FB_ACTION = "https://docs.google.com/forms/d/e/1FAIpQLSctSUod0eb60G997B0xUEhsYS3sd1xwHSGbaRu0t0kxCQ0Kqw/formResponse"
+FB_ENTRY_TYPE = "entry.1036933020"      # "This is a" (Bug / Feedback / Feature idea)
+FB_ENTRY_SUMMARY = "entry.746783322"    # "Tell us what's going on" (must be a Paragraph question)
+FB_ENTRY_OS = "entry.1686029902"        # "Your computer"
+FB_ENTRY_EMAIL = "entry.1089460190"     # "Email"
 
 # per-IP limit: 3 sign-ups per minute
 [[unsafe.bindings]]

@@ -31,7 +31,7 @@
         },
         // 2 — hardened (leave '' until the Worker is deployed; then the google block above can be emptied)
         endpoint: 'https://videobeaux-signup.schwwaaa.workers.dev',                          // e.g. https://videobeaux-signup.YOUR-NAME.workers.dev
-        turnstile: '0x4AAAAAAFk5eVrOCAT1GcTK'                           // the Turnstile *site* key (public) for that Worker
+        turnstile: '0x4AAAAAAFy0O3KnDLgqR5Dk'                           // the Turnstile *site* key (public) for that Worker
     }
 
     var reduceMotion = window.matchMedia('(prefers-reduced-motion: reduce)').matches

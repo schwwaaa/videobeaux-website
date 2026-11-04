@@ -13,7 +13,7 @@
 
     var FEEDBACK = {
         endpoint: 'https://videobeaux-signup.schwwaaa.workers.dev/feedback',
-        turnstile: '0x4AAAAAAFk5eVrOCAT1GcTK'     // the Turnstile *site* key (public), same widget as the sign-up form
+        turnstile: '0x4AAAAAAFy0O3KnDLgqR5Dk'     // the Turnstile *site* key (public), same widget as the sign-up form
     }
     var CONTACT = { user: 'videobeaux', domain: 'schwwaaa.net' }
 
