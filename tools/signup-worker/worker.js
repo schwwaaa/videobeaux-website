@@ -95,7 +95,10 @@ export async function handle(request, env, fetchImpl = fetch) {
     if (ip) form.set('remoteip', ip)
     const v = await fetchImpl('https://challenges.cloudflare.com/turnstile/v0/siteverify', { method: 'POST', body: form })
     const verdict = await v.json().catch(() => ({}))
-    if (!verdict.success) return json({ ok: false, error: 'The check failed. Please try again.' }, 400, okOrigin)
+    if (!verdict.success) {
+      console.log('turnstile rejected:', JSON.stringify(verdict['error-codes'] || []))   // visible with `npx wrangler tail`; no secrets
+      return json({ ok: false, error: 'The check failed. Please try again.' }, 400, okOrigin)
+    }
   }
 
   // forward to the Google Form
