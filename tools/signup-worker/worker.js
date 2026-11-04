@@ -15,7 +15,7 @@ const MAX_BODY = 8192
 const MAX_TEXT = 1000
 const MAX_REPORT = 4000
 const FB_TYPES = ['Bug', 'Feedback', 'Feature idea']
-const FB_OS = ['macOS (Apple silicon)', 'macOS (Intel)', 'Windows']
+const FB_OS = ['macOS (Apple silicon)', 'Windows']
 const EMAIL = /^[^\s@]{1,64}@[^\s@]{1,190}\.[^\s@]{2,}$/
 
 const json = (obj, status, origin) =>
