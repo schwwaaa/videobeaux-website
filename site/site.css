@@ -177,6 +177,17 @@ output { font: 700 .85rem var(--mono); white-space: nowrap; }
 .signup { display: grid; gap: 16px; padding: 22px; background: var(--paper); border: 5px solid var(--ink); border-radius: 14px; box-shadow: var(--shadow); }
 .signup .field span, .signup legend { display: block; margin-bottom: 6px; font: 700 .8rem var(--mono); text-transform: uppercase; letter-spacing: .05em; }
 .signup textarea { width: 100%; padding: 12px 14px; font: inherit; color: var(--ink); background: #fff; border: 4px solid var(--ink); border-radius: 10px; resize: vertical; }
+.contact { margin-top: 18px; font: 700 .95rem var(--mono); }
+.linklike { padding: 0; font: inherit; color: inherit; background: none; border: 0; border-bottom: 3px solid var(--ink); cursor: pointer; }
+.linklike:hover { color: var(--magenta); border-color: var(--magenta); }
+.field-note { display: block; margin-top: 6px; font: .8rem var(--mono); }
+.pills { display: flex; flex-wrap: wrap; gap: 10px; }
+.pill { position: relative; cursor: pointer; }
+.pill input { position: absolute; opacity: 0; inset: 0; margin: 0; cursor: pointer; }
+.pill span { display: inline-block; padding: 8px 14px; font: .82rem var(--display); text-transform: uppercase; background: #fff; border: 3px solid var(--ink); border-radius: 999px; box-shadow: 3px 3px 0 var(--ink); transition: transform .1s, box-shadow .1s; }
+.pill:hover span { transform: translate(2px, 2px); box-shadow: 1px 1px 0 var(--ink); }
+.pill input:checked + span { background: var(--ink); color: var(--paper); box-shadow: none; transform: translate(3px, 3px); }
+.pill input:focus-visible + span { outline: 4px solid var(--magenta); outline-offset: 3px; }
 .signup input[type=email] { width: 100%; padding: 12px 14px; font: inherit; color: var(--ink); background: #fff; border: 4px solid var(--ink); border-radius: 10px; }
 .signup fieldset { margin: 0; padding: 0; border: 0; display: grid; gap: 8px; }
 .signup legend { padding: 0; }

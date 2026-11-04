@@ -1,0 +1,92 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Alpha feedback — Videobeaux</title>
+    <meta name="description" content="Report a bug or share feedback on the Videobeaux alpha.">
+    <meta name="robots" content="noindex">
+    <meta name="theme-color" content="#a8ad23">
+    <link href="site/assets/favicon-32x32.png" rel="icon" sizes="32x32" type="image/png">
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Atkinson+Hyperlegible:wght@400;700&family=Bungee&family=IBM+Plex+Mono:wght@400;600;700&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="site/site.css">
+</head>
+
+<body>
+    <a class="skip-link" href="#main">Skip to content</a>
+
+    <nav class="site-nav" aria-label="Primary">
+        <div class="shell nav-inner">
+            <a class="brand" href="./" aria-label="Videobeaux home">
+                <img src="site/assets/tv-icon.png" alt="" width="34" height="34"> videobeaux
+            </a>
+            <button class="menu-button" type="button" aria-expanded="false" aria-controls="nav-links">Menu</button>
+            <div class="nav-links" id="nav-links" data-open="false">
+                <a href="./">Home</a>
+                <a href="https://schwwaaa.github.io/videobeaux/docs.html" target="_blank" rel="noopener">Manual ↗</a>
+            </div>
+        </div>
+    </nav>
+
+    <main id="main">
+        <!-- FEEDBACK — see FEEDBACK at the top of site/feedback.js (Google Form behind the scenes; not connected until configured) -->
+        <section class="section s-yellow" aria-labelledby="fb-h">
+            <div class="shell stay">
+                <div>
+                    <p class="sticker s-coral">Alpha testers</p>
+                    <h2 id="fb-h">Bugs &amp; feedback.</h2>
+                    <p>Found something broken, confusing or missing? Tell us here. The more detail, the faster we can fix it.</p>
+                    <p>Your valuable feedback will help us make videobeaux better for everyone!</p>
+                    <p>Please consider clicking the ? icon inside videobeaux to help generate a bug report.</p>
+                    <!-- Contact email: not in the page source. site/feedback.js builds it only when the button is clicked (see CONTACT there). -->
+                    <p class="contact" id="contact" hidden>Prefer email? <button type="button" class="linklike" id="contact-btn">Show email address</button></p>
+                </div>
+                <form class="signup" id="feedback" method="post" novalidate>
+                    <fieldset>
+                        <legend>This is a</legend>
+                        <label class="check"><input type="radio" name="type" value="Bug" checked> <span>Bug</span></label>
+                        <label class="check"><input type="radio" name="type" value="Feedback"> <span>Feedback</span></label>
+                        <label class="check"><input type="radio" name="type" value="Feature idea"> <span>Feature idea</span></label>
+                    </fieldset>
+                    <label class="field"><span>Tell us what's going on</span>
+                        <textarea name="summary" rows="9" maxlength="4000" required></textarea>
+                    </label>
+                    <fieldset>
+                        <legend>Your computer</legend>
+                        <div class="pills">
+                            <label class="pill"><input type="radio" name="os" value="macOS (Apple silicon)"><span>macOS (Apple silicon)</span></label>
+                            <label class="pill"><input type="radio" name="os" value="macOS (Intel)"><span>macOS (Intel)</span></label>
+                            <label class="pill"><input type="radio" name="os" value="Windows"><span>Windows</span></label>
+                        </div>
+                    </fieldset>
+                    <label class="field"><span>Email (so we can follow up)</span>
+                        <input type="email" name="email" autocomplete="email" placeholder="you@example.com">
+                        <small class="field-note">Only used to follow up on this report.</small>
+                    </label>
+                    <input class="hp" type="text" name="_gotcha" tabindex="-1" autocomplete="off" aria-hidden="true">
+                    <div class="signup-captcha" id="fb-captcha" hidden></div>
+                    <button class="button b-ink" type="submit" id="fb-btn">Send</button>
+                    <p class="signup-status" id="fb-status" role="status" aria-live="polite"></p>
+                </form>
+            </div>
+        </section>
+    </main>
+
+    <footer>
+        <div class="shell foot">
+            <a class="schwwaaa" href="https://linktr.ee/schwwaaa" target="_blank" rel="noopener"><img src="site/assets/schwwaaa-logo.webp" width="260" height="68" alt="schwwaaa"></a>
+            <div class="links">
+                <a href="./">Home</a>
+                <a href="https://schwwaaa.github.io/videobeaux/docs.html" target="_blank" rel="noopener">Manual</a>
+                <a href="https://schwwaaa.net" target="_blank" rel="noopener">schwwaaa.net</a>
+            </div>
+        </div>
+    </footer>
+
+    <script src="site/feedback.js"></script>
+</body>
+
+</html>

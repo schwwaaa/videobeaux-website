@@ -27,6 +27,13 @@ Once it's live the Google form's address and field names exist only in the Worke
    `google` block (so the Google form address leaves the page). Commit and push.
 6. Test: submit the form on the live site → a new row in the Google Sheet. Try submitting twice quickly (you should get a rate-limit message).
 
+## The alpha feedback form
+
+The same Worker also serves `feedback.html` at `POST /feedback` (same Turnstile check and rate limit), forwarding to a second Google Form.
+To switch it on: make that form (questions: type, report, computer, email), find each question's `entry.` id in its page source, fill in
+the `FB_*` values in `wrangler.toml`, and run `npx wrangler deploy` again. Until `FB_ACTION` is set the page shows "Feedback isn't set up yet."
+The type and computer options must match the Google Form's option text exactly (`FB_TYPES` / `FB_OS` at the top of `worker.js`).
+
 ## Checks
 
 `node tools/signup-worker/test.mjs` runs the Worker's logic against fake Google/Turnstile replies (origin, size, email, allowed choices, CAPTCHA,

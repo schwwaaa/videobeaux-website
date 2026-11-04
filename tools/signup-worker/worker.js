@@ -1,4 +1,5 @@
-// Cloudflare Worker: the sign-up form's back door (optional "hardened" mode — see README.md in this folder).
+// Cloudflare Worker: the back door for the sign-up form and the alpha feedback form (optional "hardened" mode — see README.md
+// in this folder). POST / is the sign-up form; POST /feedback is the bug-report form (feedback.html), which goes to its own Google Form.
 //
 //   browser ──JSON──▶ this Worker ──checks──▶ Google Form (formResponse) ──▶ Google Sheet
 //
@@ -8,9 +9,13 @@
 //
 // Settings (wrangler.toml [vars], plus the secret): GOOGLE_ACTION, ENTRY_EMAIL, ENTRY_HEAR, ENTRY_INTEREST, ALLOWED_ORIGINS
 // (comma-separated), TURNSTILE_SECRET (secret: `wrangler secret put TURNSTILE_SECRET`). Optional binding: RATE_LIMITER.
+// Feedback form settings: FB_ACTION, FB_ENTRY_TYPE, FB_ENTRY_SUMMARY, FB_ENTRY_OS, FB_ENTRY_EMAIL (until FB_ACTION is set, /feedback answers 503).
 
-const MAX_BODY = 4096
+const MAX_BODY = 8192
 const MAX_TEXT = 1000
+const MAX_REPORT = 4000
+const FB_TYPES = ['Bug', 'Feedback', 'Feature idea']
+const FB_OS = ['macOS (Apple silicon)', 'macOS (Intel)', 'Windows']
 const EMAIL = /^[^\s@]{1,64}@[^\s@]{1,190}\.[^\s@]{2,}$/
 
 const json = (obj, status, origin) =>
@@ -48,11 +53,31 @@ export async function handle(request, env, fetchImpl = fetch) {
 
   let data
   try { data = JSON.parse(raw) } catch { return json({ ok: false, error: 'Bad request.' }, 400, okOrigin) }
-  const email = typeof data.email === 'string' ? data.email.trim().toLowerCase() : ''
+  if (!data || typeof data !== 'object') return json({ ok: false, error: 'Bad request.' }, 400, okOrigin)
   const text = v => (typeof v === 'string' ? v.trim() : '')
-  const hear = text(data.hear), interest = text(data.interest)
-  if (!email || email.length > 254 || !EMAIL.test(email)) return json({ ok: false, error: 'Please enter a valid email address.' }, 400, okOrigin)
-  if (hear.length > MAX_TEXT || interest.length > MAX_TEXT) return json({ ok: false, error: 'Please keep your answers shorter.' }, 400, okOrigin)
+  const email = text(data.email).toLowerCase()
+  const badEmail = email.length > 254 || !EMAIL.test(email)
+
+  // which form: POST /feedback is the alpha bug-report form, anything else is the sign-up form
+  const feedback = new URL(request.url).pathname.replace(/\/+$/, '') === '/feedback'
+  let action, fields   // fields: [Google entry id, value] pairs, in the order they're sent
+  if (feedback) {
+    const type = text(data.type), summary = text(data.summary), os = text(data.os)
+    if (!FB_TYPES.includes(type)) return json({ ok: false, error: 'Choose what kind of report this is.' }, 400, okOrigin)
+    if (!summary) return json({ ok: false, error: 'Please tell us what’s going on.' }, 400, okOrigin)
+    if (summary.length > MAX_REPORT) return json({ ok: false, error: 'Please keep your report shorter.' }, 400, okOrigin)
+    if (os && !FB_OS.includes(os)) return json({ ok: false, error: 'Choose one of the listed computers.' }, 400, okOrigin)
+    if (email && badEmail) return json({ ok: false, error: 'That email address doesn’t look right.' }, 400, okOrigin)
+    if (!env.FB_ACTION || !env.FB_ENTRY_SUMMARY) return json({ ok: false, error: 'Feedback isn’t set up yet. Please try again later.' }, 503, okOrigin)
+    action = env.FB_ACTION
+    fields = [[env.FB_ENTRY_TYPE, type], [env.FB_ENTRY_SUMMARY, summary], [env.FB_ENTRY_OS, os], [env.FB_ENTRY_EMAIL, email]]
+  } else {
+    const hear = text(data.hear), interest = text(data.interest)
+    if (!email || badEmail) return json({ ok: false, error: 'Please enter a valid email address.' }, 400, okOrigin)
+    if (hear.length > MAX_TEXT || interest.length > MAX_TEXT) return json({ ok: false, error: 'Please keep your answers shorter.' }, 400, okOrigin)
+    action = env.GOOGLE_ACTION
+    fields = [[env.ENTRY_EMAIL, email], [env.ENTRY_HEAR, hear], [env.ENTRY_INTEREST, interest]]
+  }
 
   const ip = request.headers.get('CF-Connecting-IP') || ''
 
@@ -75,10 +100,8 @@ export async function handle(request, env, fetchImpl = fetch) {
 
   // forward to the Google Form
   const body = new URLSearchParams()
-  body.append(env.ENTRY_EMAIL, email)
-  if (hear) body.append(env.ENTRY_HEAR, hear)
-  if (interest) body.append(env.ENTRY_INTEREST, interest)
-  const g = await fetchImpl(env.GOOGLE_ACTION, { method: 'POST', body, redirect: 'manual' })
+  fields.forEach(([entry, value]) => { if (entry && value) body.append(entry, value) })
+  const g = await fetchImpl(action, { method: 'POST', body, redirect: 'manual' })
   // a successful Google Form submission answers 200, or 302 to the confirmation page
   if (!(g.status === 200 || (g.status >= 300 && g.status < 400) || g.type === 'opaqueredirect')) {
     return json({ ok: false, error: 'Could not save that right now. Please try again later.' }, 502, okOrigin)

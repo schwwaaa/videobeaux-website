@@ -10,6 +10,14 @@ ENTRY_EMAIL = "entry.1552989964"
 ENTRY_HEAR = "entry.1830674465"
 ENTRY_INTEREST = "entry.94340946"
 
+# alpha feedback form (feedback.html → POST /feedback). Fill these in from the feedback Google Form's page source; until
+# FB_ACTION is set the Worker answers /feedback with "not set up yet".
+FB_ACTION = ""            # https://docs.google.com/forms/d/e/FORM_ID/formResponse
+FB_ENTRY_TYPE = ""        # entry.123456789 (the Bug / Feedback / Feature idea question)
+FB_ENTRY_SUMMARY = ""     # the long-answer report question
+FB_ENTRY_OS = ""          # the computer question
+FB_ENTRY_EMAIL = ""       # the email question
+
 # per-IP limit: 3 sign-ups per minute
 [[unsafe.bindings]]
 name = "RATE_LIMITER"
