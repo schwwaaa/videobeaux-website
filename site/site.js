@@ -30,7 +30,7 @@
             interest: 'entry.94340946'          // "Please describe your interest/ use case"
         },
         // 2 — hardened (leave '' until the Worker is deployed; then the google block above can be emptied)
-        endpoint: 'https://videobeaux-signup.videobeaux-signup.workers.dev',                          // e.g. https://videobeaux-signup.YOUR-NAME.workers.dev
+        endpoint: 'https://videobeaux-signup.schwwaaa.workers.dev',                          // e.g. https://videobeaux-signup.YOUR-NAME.workers.dev
         turnstile: '0x4AAAAAAFk5eVrOCAT1GcTK'                           // the Turnstile *site* key (public) for that Worker
     }
 

@@ -12,10 +12,10 @@
     'use strict'
 
     var FEEDBACK = {
-        endpoint: 'https://videobeaux-signup.videobeaux-signup.workers.dev/feedback',
+        endpoint: 'https://videobeaux-signup.schwwaaa.workers.dev/feedback',
         turnstile: '0x4AAAAAAFk5eVrOCAT1GcTK'     // the Turnstile *site* key (public), same widget as the sign-up form
     }
-    var CONTACT = { user: '', domain: '' }        // e.g. { user: 'alpha', domain: 'videobeaux.online' }
+    var CONTACT = { user: 'videobeaux', domain: 'schwwaaa.net' }
 
     var $ = function (s, r) { return (r || document).querySelector(s) }
 

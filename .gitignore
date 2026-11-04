@@ -48,6 +48,7 @@ _scratch/
 
 # ── Tooling that may appear if the site grows ────────────
 node_modules/
+.wrangler/
 .npm/
 .cache/
 .parcel-cache/
