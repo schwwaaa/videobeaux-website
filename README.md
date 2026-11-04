@@ -7,7 +7,8 @@ this repo's **`v2`** branch (root folder); `CNAME` holds the domain.
 index.html          the page — all the copy lives here
 feedback.html       bug reports and feedback for alpha testers (noindex; not linked from the home page, send testers the link)
 index_old.html      the previous landing page (kept as a fallback; has noindex)
-docs.html           the manual
+manual.html         the videobeaux manual for the app (GUI): getting started, then every program mode and its settings
+docs.html           the original command-line documentation (kept as is)
 assets/             images used by the old page and docs.html
 site/
 ├── site.css        styles (colours and fonts are variables at the top)
