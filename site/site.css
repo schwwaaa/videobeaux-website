@@ -183,6 +183,13 @@ output { font: 700 .85rem var(--mono); white-space: nowrap; }
 .fb-tv { width: 130px; height: auto; margin: 0 0 6px 4px; transform: rotate(-7deg); filter: drop-shadow(5px 6px 0 var(--ink)); transform-origin: 50% 90%; animation: tv-bob 3.4s ease-in-out infinite alternate; transition: transform .2s; }
 .fb-tv:hover { animation: none; transform: rotate(6deg) scale(1.08); }
 @keyframes tv-bob { from { transform: rotate(-9deg) translateY(0); } to { transform: rotate(-4deg) translateY(-6px); } }
+/* sign-up form after a send: its fields are hidden and the thank-you fills the same box (JS pins the height first, so nothing jumps) */
+.signup.sent { align-content: center; text-align: center; }
+.signup.sent > :not(.signup-thanks) { display: none !important; }
+.signup-thanks h3 { font-size: clamp(1.6rem, 4vw, 2.4rem); }
+.signup-thanks p { margin-top: 12px; font-size: 1.15rem; font-weight: 700; }
+.signup-thanks b { font-family: var(--display); font-weight: 400; letter-spacing: .02em; }
+.signup-thanks:focus { outline: none; }
 .thanks { align-content: center; min-height: 260px; text-align: center; }
 .thanks h3 { font-size: clamp(1.6rem, 4vw, 2.4rem); }
 .thanks p { font-size: 1.1rem; font-weight: 700; }

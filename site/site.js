@@ -62,7 +62,13 @@
     function say(text, bad) { statusEl.textContent = text; statusEl.className = 'signup-status' + (bad ? ' bad' : ' good') }
     function recentlyJoined() { try { return Date.now() - Number(localStorage.getItem(KEY)) < COOLDOWN } catch (e) { return false } }
     function remember() { try { localStorage.setItem(KEY, String(Date.now())) } catch (e) { /* private mode */ } }
-    function done() { say('Thanks! You’re on the list.'); form.reset(); remember(); signBtn.disabled = false }
+    // after a send the form's fields give way to a thank-you inside the same box (height pinned so the box doesn't resize); reloading restores the form
+    function showThanks() {
+        var box = $('#signup-thanks')
+        form.style.height = form.offsetHeight + 'px'
+        form.reset(); form.classList.add('sent'); box.hidden = false; box.focus()
+    }
+    function done() { remember(); showThanks() }
 
     // Turnstile (hardened mode): load Cloudflare's script only when the form is near the screen
     var turnstileId = null
@@ -94,7 +100,7 @@
         if (signBtn.disabled) return
         if (recentlyJoined()) { say('You’re already on the list. Thanks!'); return }
         // bots fill the hidden field or submit instantly; pretend it worked and send nothing
-        if (form.elements._gotcha.value || Date.now() - pageLoaded < 2500) { say('Thanks! You’re on the list.'); signBtn.disabled = false; return }
+        if (form.elements._gotcha.value || Date.now() - pageLoaded < 2500) { showThanks(); return }
         signBtn.disabled = true; say('Sending…')
 
         if (mode === 'worker') {

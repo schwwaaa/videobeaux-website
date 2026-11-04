@@ -5,17 +5,20 @@ this repo's **`v2`** branch (root folder); `CNAME` holds the domain.
 
 ```
 index.html          the page — all the copy lives here
+feedback.html       bug reports and feedback for alpha testers (noindex; not linked from the home page, send testers the link)
 index_old.html      the previous landing page (kept as a fallback; has noindex)
 docs.html           the manual
 assets/             images used by the old page and docs.html
 site/
 ├── site.css        styles (colours and fonts are variables at the top)
-├── site.js         player, example library, sign-up form
+├── site.js         player, example library, alpha sign-up form
+├── feedback.js     feedback page: form, Turnstile, thank-you note, click-to-reveal contact email (CONTACT at the top)
 ├── assets/         logo, favicon, mascot
 ├── shots/          app screenshots (made by tools/site-harness/shots.sh in the videobeaux-gui repo)
 └── previews/       example clips, posters and examples.json (made by tools/render-site-examples.py in videobeaux-gui)
 tools/serve.py      local test server
-tools/signup-worker/  optional Cloudflare Worker for the hardened sign-up (worker.js, wrangler.toml, test.mjs, README.md)
+tools/signup-worker/  the Cloudflare Worker behind both forms: Turnstile CAPTCHA, rate limit, validation (worker.js, wrangler.toml, test.mjs,
+                    README.md: setup, Wrangler commands, troubleshooting). Deploy it with `npx wrangler deploy` from that folder.
 ```
 
 ## Work on it
@@ -52,12 +55,17 @@ show before "Show all"). Options: `--only id1,id2`, `--force`, `--jobs 3`, `--si
 examples need the Vosk model and kokoro-tts installed (skipped with a message otherwise); Remove Background (AI) needs `models/bgremove/`.
 The page reads `site/previews/examples.json`, so a new example appears as soon as its `.mp4` and `.jpg` are next to it.
 
-## The sign-up form ("Stay in the loop")
+## The alpha sign-up form ("Get alpha access") and the feedback page
+
+**Live setup:** both forms use the **hardened** mode below. They post to the Cloudflare Worker in `tools/signup-worker/`, which checks a Turnstile
+CAPTCHA and forwards to a Google Form each (sign-up form, and the bug-report form for `feedback.html`). **Everything about the Worker, Turnstile,
+Wrangler, the Google Forms' required question types and error messages is in `tools/signup-worker/README.md`.** The rest of this section describes
+the original sign-up form and the direct mode (still in `site.js` as a fallback: it's used only if `endpoint` is emptied).
 
 The form is on the page; the answers go to a **Google Form** and collect in its Google Sheet (Responses tab → *Link to Sheets*, plus
 *Get email notifications*). Visitors never see Google's form page. It is configured in `SIGNUP` at the top of `site/site.js`, in one of two ways:
 
-| | **Direct** (live now) | **Hardened** (optional upgrade) |
+| | **Direct** (fallback) | **Hardened** (live now) |
 |---|---|---|
 | Path | page → Google Form `/formResponse` | page → your Cloudflare Worker → Google Form |
 | Set | `google.action`, `google.email`, `google.interest`, `google.labels` | `endpoint` (+ `turnstile` site key) |
@@ -68,11 +76,12 @@ The form is on the page; the answers go to a **Google Form** and collect in its 
 | Knows if it really saved | no (Google hides the reply) | yes (shows an error when it didn't) |
 | Setup | none | free Cloudflare account, ~10 minutes (`tools/signup-worker/README.md`) |
 
-**Google Form requirements:** an **Email** short-answer question (required, Response validation → Email address) and a **Checkboxes** question (not
-Multiple choice) with the options *Updates and news* and *Join the testing group*. Don't require sign-in; leave "Limit to 1 response" off; don't turn on
-"Collect email addresses". If you edit a question, its `entry.…` name changes — open the form's responder link, view the page source and search for `entry.`.
+**Google Form requirements (sign-up):** an **Email** short-answer question (required, Response validation → Email address) plus two optional
+short-answer questions ("How did you hear about Videobeaux?" and "Your interest / use case"). Don't require sign-in; leave "Limit to 1 response" off;
+don't turn on "Collect email addresses". If you add or delete a question, its `entry.…` name changes: open the form's responder link, view the page
+source and search for `entry.` (the feedback form's requirements are in `tools/signup-worker/README.md`).
 
-**What protects it (both modes):** the page checks the email (format, length), needs at least one choice, ignores a hidden honeypot field and
+**What protects it (both modes):** the page checks the email (format, length), ignores a hidden honeypot field and
 instant (<2.5 s) submits, locks the button while sending, and remembers a successful sign-up in the browser for 10 minutes. The hardened mode adds
 the CAPTCHA, the per-IP limit and server-side checks, and hides the Google form entirely.
 
