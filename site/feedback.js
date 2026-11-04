@@ -44,6 +44,11 @@
     var form = $('#feedback'), statusEl = $('#fb-status'), btn = $('#fb-btn'), captchaEl = $('#fb-captcha'), pageLoaded = Date.now()
 
     function say(text, bad) { statusEl.textContent = text; statusEl.className = 'signup-status' + (bad ? ' bad' : ' good') }
+    // after a send the form is replaced by a thank-you note; reloading the page brings the form back
+    function thanks() {
+        var box = $('#fb-thanks')
+        form.reset(); form.hidden = true; box.hidden = false; box.focus()
+    }
 
     // Turnstile: load Cloudflare's script only when the form is near the screen
     var turnstileId = null
@@ -74,7 +79,7 @@
         if (v('email') && !email.checkValidity()) { email.focus(); say('That email address doesn’t look right.', true); return }
         if (btn.disabled) return
         // bots fill the hidden field or submit instantly; pretend it worked and send nothing
-        if (form.elements._gotcha.value || Date.now() - pageLoaded < 2500) { say('Thanks! We got it.'); return }
+        if (form.elements._gotcha.value || Date.now() - pageLoaded < 2500) { thanks(); return }
         var token = (window.turnstile && turnstileId !== null) ? window.turnstile.getResponse(turnstileId) : ''
         if (FEEDBACK.turnstile && !token) { say('Please complete the check above.', true); return }
         btn.disabled = true; say('Sending…')
@@ -84,7 +89,7 @@
             .then(function (r) { return r.json().catch(function () { return {} }).then(function (j) { return { ok: r.ok && j.ok, j: j } }) })
             .then(function (res) {
                 btn.disabled = false
-                if (res.ok) { say('Thanks! We got it.'); form.reset() }
+                if (res.ok) thanks()
                 else say(res.j && res.j.error ? res.j.error : 'Couldn’t send that. Please try again in a moment.', true)
                 if (window.turnstile && turnstileId !== null) window.turnstile.reset(turnstileId)
             })
