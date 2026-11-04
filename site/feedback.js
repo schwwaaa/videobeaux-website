@@ -1,4 +1,4 @@
-/* Videobeaux alpha feedback form (feedback.html). No dependencies.
+/* videobeaux alpha feedback form (feedback.html). No dependencies.
  *
  * The form posts to the same Cloudflare Worker as the sign-up form (tools/signup-worker/), at /feedback. The Worker checks a Cloudflare
  * Turnstile CAPTCHA, rate-limits per IP, validates the input and forwards it to the feedback Google Form, so that form's address and

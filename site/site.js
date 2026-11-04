@@ -1,4 +1,4 @@
-/* Videobeaux site — before/after player, example library, sign-up form. No dependencies.
+/* videobeaux site — before/after player, example library, sign-up form. No dependencies.
  *
  * The examples come from previews/examples.json, written by tools/render-site-examples.py
  * (add an example: edit tools/site_examples.json, run the script, reload).
