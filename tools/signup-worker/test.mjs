@@ -40,7 +40,7 @@ calls = []; r = await handle(req(good), env, fakeFetch(false)); assert.equal(r.s
 r = await handle(req(good), env, fakeFetch(true, 500)); assert.equal(r.status, 502)
 r = await handle(req(good), env, fakeFetch(true, 302)); assert.equal(r.status, 200)                                                    // Google redirect = success
 r = await handle(req(good), { ...env, RATE_LIMITER: { limit: async () => ({ success: false }) } }, fakeFetch()); assert.equal(r.status, 429)
-// ── alpha feedback form (POST /feedback) ──
+// ── beta feedback form (POST /feedback) ──
 const fbEnv = { ...env, FB_ACTION: 'https://example.test/fb/formResponse', FB_ENTRY_TYPE: 'entry.10', FB_ENTRY_SUMMARY: 'entry.11', FB_ENTRY_OS: 'entry.12', FB_ENTRY_EMAIL: 'entry.13' }
 const fb = { type: 'Bug', summary: 'CRT mode crashes on export', os: 'Windows', email: 'T@Example.com', token: 'tok' }
 const fbReq = (body, o = {}) => req(body, { path: '/feedback', ...o })

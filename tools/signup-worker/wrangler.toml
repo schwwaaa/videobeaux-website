@@ -10,7 +10,7 @@ ENTRY_EMAIL = "entry.1552989964"
 ENTRY_HEAR = "entry.1830674465"
 ENTRY_INTEREST = "entry.94340946"
 
-# alpha feedback form (feedback.html → POST /feedback). Fill these in from the feedback Google Form's page source; until
+# beta feedback form (feedback.html → POST /feedback). Fill these in from the feedback Google Form's page source; until
 # FB_ACTION is set the Worker answers /feedback with "not set up yet".
 FB_ACTION = "https://docs.google.com/forms/d/e/1FAIpQLSctSUod0eb60G997B0xUEhsYS3sd1xwHSGbaRu0t0kxCQ0Kqw/formResponse"
 FB_ENTRY_TYPE = "entry.1036933020"      # "This is a" (Bug / Feedback / Feature idea)

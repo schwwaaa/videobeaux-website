@@ -1,6 +1,6 @@
 # Hardened forms: Cloudflare Worker + Turnstile
 
-A tiny Cloudflare Worker that sits between the website's two forms (alpha sign-up on the home page, bug reports on `feedback.html`) and their
+A tiny Cloudflare Worker that sits between the website's two forms (beta sign-up on the home page, bug reports on `feedback.html`) and their
 Google Forms. Free tier is plenty. Your site does **not** have to be hosted on Cloudflare (it's on GitHub Pages): the Worker lives at a
 `workers.dev` address and the Turnstile widget loads from Cloudflare into any page.
 

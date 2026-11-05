@@ -5,14 +5,14 @@ this repo's **`v2`** branch (root folder); `CNAME` holds the domain.
 
 ```
 index.html          the page — all the copy lives here
-feedback.html       bug reports and feedback for alpha testers (noindex; not linked from the home page, send testers the link)
+feedback.html       bug reports and feedback for beta testers (noindex; not linked from the home page, send testers the link)
 index_old.html      the previous landing page (kept as a fallback; has noindex)
 manual.html         the videobeaux manual for the app (GUI): getting started, then every program mode and its settings
 docs.html           the original command-line documentation (kept as is)
 assets/             images used by the old page and docs.html
 site/
 ├── site.css        styles (colours and fonts are variables at the top)
-├── site.js         player, example library, alpha sign-up form
+├── site.js         player, example library, beta sign-up form
 ├── feedback.js     feedback page: form, Turnstile, thank-you note, click-to-reveal contact email (CONTACT at the top)
 ├── assets/         logo, favicon, mascot
 ├── shots/          app screenshots (made by tools/site-harness/shots.sh in the videobeaux-gui repo)
@@ -56,7 +56,7 @@ show before "Show all"). Options: `--only id1,id2`, `--force`, `--jobs 3`, `--si
 examples need the Vosk model and kokoro-tts installed (skipped with a message otherwise); Remove Background (AI) needs `models/bgremove/`.
 The page reads `site/previews/examples.json`, so a new example appears as soon as its `.mp4` and `.jpg` are next to it.
 
-## The alpha sign-up form ("Get alpha access") and the feedback page
+## The beta sign-up form ("Get beta access") and the feedback page
 
 **Live setup:** both forms use the **hardened** mode below. They post to the Cloudflare Worker in `tools/signup-worker/`, which checks a Turnstile
 CAPTCHA and forwards to a Google Form each (sign-up form, and the bug-report form for `feedback.html`). **Everything about the Worker, Turnstile,

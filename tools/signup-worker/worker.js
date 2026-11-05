@@ -1,4 +1,4 @@
-// Cloudflare Worker: the back door for the sign-up form and the alpha feedback form (optional "hardened" mode — see README.md
+// Cloudflare Worker: the back door for the sign-up form and the beta feedback form (optional "hardened" mode — see README.md
 // in this folder). POST / is the sign-up form; POST /feedback is the bug-report form (feedback.html), which goes to its own Google Form.
 //
 //   browser ──JSON──▶ this Worker ──checks──▶ Google Form (formResponse) ──▶ Google Sheet
@@ -58,7 +58,7 @@ export async function handle(request, env, fetchImpl = fetch) {
   const email = text(data.email).toLowerCase()
   const badEmail = email.length > 254 || !EMAIL.test(email)
 
-  // which form: POST /feedback is the alpha bug-report form, anything else is the sign-up form
+  // which form: POST /feedback is the beta bug-report form, anything else is the sign-up form
   const feedback = new URL(request.url).pathname.replace(/\/+$/, '') === '/feedback'
   let action, fields   // fields: [Google entry id, value] pairs, in the order they're sent
   if (feedback) {
